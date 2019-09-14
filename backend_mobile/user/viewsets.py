@@ -24,12 +24,13 @@ class UserViewSet(ModelViewSet):
         user_is_exist = User.objects.filter(email=email)
 
         if len(user_is_exist) > 0:
-            return Response({'Message': 'Usuário já cadastrado'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'Message': 'Usuário já cadastrado', 'success': False},
+                            status=status.HTTP_404_NOT_FOUND)
 
         new_user = User.objects.create_user(username=email, email=email, name=name)
         new_user.set_password(password)
         new_user.save()
-        return Response({'message': 'Cadastro efetuado com sucesso'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Cadastro efetuado com sucesso', 'success': True}, status=status.HTTP_201_CREATED)
 
     @action(methods=['POST'], detail=False, permission_classes=[AllowAny])
     def sign_in(self, request):
@@ -37,7 +38,7 @@ class UserViewSet(ModelViewSet):
         password = request.data['password']
 
         if not email or not password:
-            return Response({'message': 'Informe os dados para que consiga efetuar o login'},
+            return Response({'message': 'Informe os dados para que consiga efetuar o login', 'success': False},
                             status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -45,9 +46,9 @@ class UserViewSet(ModelViewSet):
             if user_is_exist:
                 user = authenticate(username=email, password=password)
                 token = Token.objects.create(user=user)
-                return Response({'message': 'Login efetuado com sucesso', 'token': str(token)},
+                return Response({'message': 'Login efetuado com sucesso', 'success': True, 'token': str(token)},
                                 status=status.HTTP_200_OK)
         except Exception as exc:
             print(exc)
-            return Response({'message': 'Nenhum usuário encontrado ou os dados foram informados errados'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': 'Nenhum usuário encontrado ou os dados foram informados errados',
+                             'success': False}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
