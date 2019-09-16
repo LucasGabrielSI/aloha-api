@@ -1,10 +1,7 @@
-from django.contrib.auth import authenticate
-from django.http import JsonResponse
-
 from users.models import User
-from rest_framework import status
-from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework.decorators import action
+from django.contrib.auth import authenticate
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
